@@ -20,9 +20,11 @@
     "firebase": "^8.2.2",
     "firebaseui": "^4.7.1",
     "hammerjs": "^2.0.8",
+    "https": "^1.0.0",
     "image-size": "^0.9.3",
     "local-web-server": "^4.2.1",
     "openssl": "^1.1.0",
+    "redbird": "^0.10.0",
     "route-async": "^1.0.7"
   }
 }

@@ -141,10 +141,11 @@ body {
 }
 .navbar {
     background-color: #00000069;
+    padding-left: 0.5rem;
 }
 
 .navbar-brand {
-    margin-left: 1rem;
+    margin-left: 0.5rem;
 }
 
 .side-nav {

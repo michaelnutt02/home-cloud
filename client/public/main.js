@@ -32,7 +32,11 @@ homecloud.galleryController = function(){
 
   homecloud.serverManager.beginListening(()=>{
     api = homecloud.serverManager.getServer()
-    if(api) startUp();
+    if(api) {
+      document.getElementById("CALink").href = api;
+      // console.log(`help ${document.getElementById("CALink").href}`)
+      startUp();
+    }
     else console.log("No server set up.  I'm lazy so you have to do that through the console.")
   })
 

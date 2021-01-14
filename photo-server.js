@@ -1,6 +1,8 @@
 const express = require('express');
+const https = require("https");
 const app = express();
-const port = process.env.PORT || 29980; //listens on localhost:29980 during development
+const httpsPort = process.env.PORT || 29979;
+const httpPort = process.env.PORT || 29980;
 const cors = require('cors');
 const fs = require('fs');
 const bodyParser = require("body-parser");
@@ -11,6 +13,20 @@ const asyncRoute = require('route-async')
 const { fdir } = require("fdir");
 const fg = require('fast-glob');
 const { readdirSync } = require('fs')
+
+const options = {
+  key: fs.readFileSync("certs/dev-key.pem"),
+  cert: fs.readFileSync("certs/rootSSLnopass.pem")
+};
+
+// var redbird = new require('redbird')({
+// 	port: 8080,
+// 	ssl: {
+// 		port: httpsPort,
+// 		key: "certs/dev-key.pem",
+// 		cert: "certs/rootSSLnopass.pem",
+// 	}
+// });
 
 const rootPaths = require("./rootPaths.json")
 // const crawler = new fdir().withBasePath();
@@ -347,4 +363,6 @@ function getDirectoryNames(dir, callback) {
   });
 }
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(httpPort, () => console.log(`Listening on port ${httpPort}`));
+https.createServer(options, app).listen(httpsPort);
+// redbird.register('localhost', `http://localhost:${httpPort}`, {ssl: true});
