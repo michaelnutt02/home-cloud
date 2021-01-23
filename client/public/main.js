@@ -121,7 +121,11 @@ homecloud.galleryController = function(){
 
   function selectDirectories(dir, subDirs) {
     subDirs.forEach(subDir => {
-      let dirElem = htmlToElement(`<div class="dir-button">${curRoots.includes(subDir)?subDir.replace(/^.*[\\\/]/, ''):subDir}<div class="dir-button-overlay"></div></div>`);
+      let dirElem = htmlToElement(
+        `<div class="dir-button">
+          ${curRoots.includes(subDir)?subDir.replace(/^.*[\\\/]/, ''):subDir}
+          <div class="dir-button-overlay"></div>
+        </div>`);
       dirElem.onclick = () => {
           navigateToDirectory(dir+subDir);
       };
@@ -180,7 +184,7 @@ homecloud.galleryController = function(){
         ratio: 1,
         index: index,
         url: getImageUrl(image.dir+image.name),
-        element: htmlToElement(`<div class="pin"><div class="pin-overlay"></div>`)
+        element: htmlToElement(`<div class="pin"><div class="pin-overlay2"></div>`)
       };
     }).catch(err => {
       return undefined;

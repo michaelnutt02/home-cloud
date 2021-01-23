@@ -163,7 +163,7 @@ function getAllImages(dir, nesting) {
   .withMaxDepth(nesting)
   .crawl(dir[dir.length-1]=="\\"?dir.substring(0,dir.length-1):dir)
   .sync()
-  .filter(file=>/\.(png|jpe?g|svg|gif)$/i.test(file))
+  .filter(file=>/\.(png|jpe?g|svg|gif|jfif)$/i.test(file))
   return files;
 }
 
@@ -172,7 +172,7 @@ function getRandomImage(dir) {
   .withBasePath()
   .crawl(dir[dir.length-1]=="\\"?dir.substring(0,dir.length-1):dir)
   .sync()
-  .filter(file=>/\.(png|jpe?g|svg|gif)$/i.test(file))
+  .filter(file=>/\.(png|jpe?g|svg|gif|jfif)$/i.test(file))
   return files[Math.floor(Math.random() * files.length)];
 }
 
@@ -226,7 +226,7 @@ function mergeSubDirs(dirs, images, callback) {
 function getRandomImageObject(files) {
   const images = files
   .filter(file =>  {
-    return /\.(png|jpe?g|svg|gif)$/i.test(file.name);
+    return /\.(png|jpe?g|svg|gif|jfif)$/i.test(file.name);
   })
   const selectedImages = [images[Math.floor(Math.random()*images.length)]].filter(x=>x && !!x.name);
   return selectedImages? selectedImages:[];

@@ -23,7 +23,25 @@
     background: radial-gradient(#00000000, #00000088);
 }
 
+.pin-overlay2 {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    transition: .5s ease;
+    outline: outset #356c8188 7px;
+    /* background: radial-gradient(#00000000, #00000088); */
+}
+
 .pin:hover .pin-overlay {
+    opacity: 1;
+}
+
+.pin:hover .pin-overlay2 {
     opacity: 1;
 }
 
