@@ -72,7 +72,7 @@ app.get('/api/getImageNames', (req, res) => {
       res.send(files? files
         .filter(file =>  {
           let stat = fs.statSync(dir+file);
-          return stat && !stat.isDirectory() && /\.(png|jpe?g|svg|gif)$/i.test(file);
+          return stat && !stat.isDirectory() && /\.(png|jpe?g|svg|gif|jfif)$/i.test(file);
         }):[]);
     });
   }
@@ -194,7 +194,7 @@ function mergeInfiniteSubDirs(dirs, images, callback) {
       let stat = fs.statSync(dirs[0]+file);
       return stat && stat.isDirectory();
     }).map(x=>dirs[0]+x+"/"):[];
-    const dirImages = files? files.filter(file => /\.(png|jpe?g|svg|gif)$/i.test(file)).map(file => {
+    const dirImages = files? files.filter(file => /\.(png|jpe?g|svg|gif|jfif)$/i.test(file)).map(file => {
       return {
         name: file,
         dir: dirs[0]
@@ -308,7 +308,7 @@ app.get('/api/getImageDataFromDir', (req, res) => {
     fs.readdir(dir, (err, files) => {
       res.send(files? files
         .filter(file =>  {
-          return /\.(png|jpe?g|svg|gif)$/i.test(file);
+          return /\.(png|jpe?g|svg|gif|jfif)$/i.test(file);
         })
         .map(file => {
           try{

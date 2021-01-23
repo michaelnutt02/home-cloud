@@ -500,10 +500,6 @@ homecloud.galleryController = function(){
     pageNumElem.innerHTML = `${image.index+1} of ${pageImageNames.length}`;
   }
 
-  function closeElement(elem) {
-    elem.remove();
-  }
-
   function navigateToDirectory(path) {
       location.href = `?path=${path}\\&nesting=${curNesting}&sortBy=date`;
   }
@@ -564,6 +560,10 @@ homecloud.ServerManager = class {
     if(!docSnapshot) return undefined;
     return docSnapshot["server"];
   }
+}
+
+function closeElement(elem) {
+  elem.remove();
 }
 
 homecloud.FbAuthManager = class {
