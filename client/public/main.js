@@ -487,7 +487,7 @@ homecloud.galleryController = function(){
     const imageInfoElem = fullscreenElem.querySelector("#imageInfoModal");
     setScrollPosition(image.y + picHolderPosition.y - 56);
     imgElem.src = image.url;
-    imageInfoElem.querySelectorAll("p")[0].innerHTML = `"${image.name.replace(/\.(png|jpe?g|svg|gif)$/i,'')}" from ${image.path}`;
+    imageInfoElem.querySelectorAll("p")[0].innerHTML = `"${image.name.replace(/\.(png|jpe?g|svg|gif|jfif)$/i,'')}" from ${image.path}`;
     imageInfoElem.querySelectorAll("p")[1].innerHTML = `${image.mtime}`;
     if(fullscreenElem.clientHeight==0)
       imgElem.onload = function() {
