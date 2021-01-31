@@ -7,8 +7,6 @@ homecloud.galleryController = function(){
   let fullscreenElement = "";
   let imageInfoElement = "";
   let api = homecloud.serverManager.getServer();
-  /*"http://10.0.0.8:29980/api/" //184.56.81.118 | 192.168.1.121 | localhost 
-  | C:\Users\Michael\Downloads\upnpc-exe-win32-20080925\upnpc-shared.exe -a 73.103.113.150 29979 29979 TCP*/
 
   const queryString = location.search;
   const urlParams = new URLSearchParams(queryString);

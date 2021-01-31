@@ -3,6 +3,7 @@ package-lock.json
 .firebaserc
 init_app.js
 certs/*
+servernotes.txt
 
 
 # Logs
