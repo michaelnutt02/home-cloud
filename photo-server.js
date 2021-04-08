@@ -13,6 +13,7 @@ const asyncRoute = require('route-async')
 const { fdir } = require("fdir");
 const fg = require('fast-glob');
 const { readdirSync } = require('fs')
+const natUpnp = require('nat-upnp');
 
 const options = {
   key: fs.readFileSync("certs/dev-key.pem"),
@@ -366,3 +367,22 @@ function getDirectoryNames(dir, callback) {
 app.listen(httpPort, () => console.log(`Listening on port ${httpPort}`));
 https.createServer(options, app).listen(httpsPort);
 // redbird.register('localhost', `http://localhost:${httpPort}`, {ssl: true});
+ 
+var client = natUpnp.createClient();
+client.getMappings({ local: true }, function(err, results) {
+    // console.log(results)
+    if(results.some(portMap=>{
+        return (portMap.public.port == 29980 && portMap.private.port == 29979) 
+    })) console.log('port mapping found')
+    else {
+      console.log('setting up port map')
+      client.portMapping({
+          public: 29980,
+          private: 29979,
+          ttl: 0,
+          description: 'myhomecloud.app'
+        }, function(err) {
+          if(err) console.log('fuck')
+        });
+  }
+});

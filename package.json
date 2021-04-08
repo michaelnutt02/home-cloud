@@ -23,6 +23,7 @@
     "https": "^1.0.0",
     "image-size": "^0.9.3",
     "local-web-server": "^4.2.1",
+    "nat-upnp": "^1.1.1",
     "openssl": "^1.1.0",
     "redbird": "^0.10.0",
     "route-async": "^1.0.7"
