@@ -1,0 +1,32 @@
+<service>
+	<id>homecloudphotoserver.exe</id>
+	<name>homecloud photo server</name>
+	<description>photo server for myhomecloud.app</description>
+	<executable>C:\Program Files\nodejs\node.exe</executable>
+	<argument>--harmony</argument>
+	<argument>--max_old_space_size=4096</argument>
+	<argument>M:\Home-Cloud_2\node_modules\node-windows\lib\wrapper.js</argument>
+	<argument>--file</argument>
+	<argument>M:\Home-Cloud_2\photo-server.js</argument>
+	<argument>--scriptoptions=</argument>
+	<argument>--log</argument>
+	<argument>homecloud photo server wrapper</argument>
+	<argument>--grow</argument>
+	<argument>0.25</argument>
+	<argument>--wait</argument>
+	<argument>1</argument>
+	<argument>--maxrestarts</argument>
+	<argument>3</argument>
+	<argument>--abortonerror</argument>
+	<argument>n</argument>
+	<argument>--stopparentfirst</argument>
+	<argument>undefined</argument>
+	<logmode>rotate</logmode>
+	<stoptimeout>30sec</stoptimeout>
+	<serviceaccount>
+		<domain>NYOOM</domain>
+		<user>LocalSystem</user>
+		<password></password>
+	</serviceaccount>
+	<workingdirectory>M:\Home-Cloud_2</workingdirectory>
+</service>
