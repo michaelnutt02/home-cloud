@@ -4,6 +4,7 @@ package-lock.json
 init_app.js
 certs/*
 servernotes.txt
+authedUsers.json
 
 
 # Logs
