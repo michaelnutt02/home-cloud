@@ -16,30 +16,25 @@ function saveRootPaths() {
       })
 }
 
-var rand = function() {
-    return Math.random().toString(36).substr(2); // remove `0.`
-};
+function saveAuthedUsers() {
+    var authedUsersText = document.getElementById('authedUsersInput').value
+    var authedUsersArray = authedUsersText.replaceAll(', ',',').split(',')
+    console.log(authedUsersArray)
 
-var token = function() {
-    return rand() + rand(); // to make it longer
-};
+    fetch(api+'updateAuthedUsers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          authedUsers: authedUsersArray
+        })
+      })
+}
 
 homecloud.initializePage = function() {
     if(homecloud.page == 'main') {
         homecloud.serverManager = new homecloud.ServerManager();
-
-        homecloud.serverManager.beginListening(()=>{
-            let token = homecloud.serverManager.getToken()
-            fetch(api+'setToken', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  token: [token]
-                })
-              })
-        });
 
         fetch(api+'getRoots')
             .then(response => response.json())
@@ -52,6 +47,14 @@ homecloud.initializePage = function() {
             .then(ip => {
                 document.getElementById('serverIP').innerHTML = 'Server IP: '+ip
             })
+        
+        fetch(api+'getAuthedUsers')
+            .then(response => response.json())
+            .then(users => {
+                document.getElementById('authedUsersInput').value = (users?(users.additionalUsers || []):[]).join(',')
+            })
+        
+        document.getElementById('myUID').innerHTML = 'Your UID: '+homecloud.fbAuthManager.uid
     }
 }
 
@@ -87,23 +90,6 @@ homecloud.ServerManager = class {
     const docSnapshot = this._documentSnapshots.data();
     if(!docSnapshot) return undefined;
     return docSnapshot["server"];
-  }
-  getToken() {
-    if(!this._documentSnapshots) return undefined;
-    const docSnapshot = this._documentSnapshots.data();
-    if(!docSnapshot) return undefined;
-    if(!docSnapshot["token"]) {
-      this._ref.set({
-        token: token()
-      }, {merge: true})
-      .then(function() {
-          console.log("Token Added");
-      })
-      .catch(function(error) {
-          console.error("Error writing document: ", error);
-      });
-    }
-    return docSnapshot["token"];
   }
 }
 
@@ -141,6 +127,18 @@ homecloud.fbAuthManager = new homecloud.FbAuthManager();
     homecloud.fbAuthManager.beginListening(()=>{
         console.log("auth change callback fired.");
         console.log("sign in: ", homecloud.fbAuthManager.isSignedIn);
+
+        if(homecloud.fbAuthManager.isSignedIn) {
+            fetch(api+'updateServerOwner', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  owner: homecloud.fbAuthManager.uid
+                })
+              })
+        }
 
         homecloud.checkForRedirects();
 

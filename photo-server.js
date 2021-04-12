@@ -27,8 +27,9 @@ function getRootPaths() {
   return JSON.parse(fs.readFileSync('rootPaths.json').toString())
 }
 
-function getTokens() {
-  return JSON.parse(fs.readFileSync('tokens.json').toString())
+function getAuthedUsers() {
+  let authedUsersObject = fs.existsSync('authedUsers.json')?JSON.parse(fs.readFileSync('authedUsers.json').toString()):{}
+  return [authedUsersObject.owner || "", ...(authedUsersObject.additionalUsers || [])]
 }
 
 app.use(cors());
@@ -46,7 +47,7 @@ app.get('/api/imageByPath', (req, res) => {
       .verifyIdToken(req.query.authorization.substring(6))
       .then((decodedToken) => {
         const uid = decodedToken.uid;
-        if(getTokens().some(x=> uid == x))
+        if(getAuthedUsers().some(x=> uid == x))
           res.sendFile(req.query.path);
         else 
           return res.status(401).json({ message: 'Incorrect Authorization Param' })

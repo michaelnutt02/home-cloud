@@ -6,8 +6,8 @@ homecloud.galleryController = function(){
   const body = document.querySelector('body');
   let fullscreenElement = "";
   let imageInfoElement = "";
-  let api = homecloud.serverManager.getServer();
-  let userToken = homecloud.serverManager.getToken();
+  let api = undefined;
+  let userToken = undefined;
 
   const queryString = location.search;
   const urlParams = new URLSearchParams(queryString);
@@ -37,7 +37,8 @@ homecloud.galleryController = function(){
       // console.log(`help ${document.getElementById("CALink").href}`)
       startUp();
     }
-    else console.log("No server set up.  You can do this through the server client (localhost:29990).")
+    else document.getElementsByClassName("page-container")[0].innerHTML +="No server set up.  You can access this via the Server IP option "+
+      "in the settings (check hamburger menu on the left)."
   })
 
   async function startUp() {
@@ -66,7 +67,9 @@ homecloud.galleryController = function(){
       .catch(err => {
         console.log(err)
         document.getElementsByClassName("page-container")[0].innerHTML += "Error connecting to server.  Most likely cause is an expered CA certificate." + 
-          '<a class="nav-link" href="'+api+'">Click here, and if your browser prompts you about an untrusted source, go into advanced and click proceed to site.  Then return to this page.</a>'
+          '<a class="nav-link" href="'+api+'">Click here, and if your browser prompts you about an untrusted source, go into advanced and click proceed to site.  '+
+          'Then return to this page.</a> If this does not fix this error, the server IP may be incorrect or you may not be authorized on the server.  '+
+          'The server IP is accessable via the settings in the hamburger menu.'
       })
   }
 
@@ -575,23 +578,6 @@ homecloud.ServerManager = class {
     const docSnapshot = this._documentSnapshots.data();
     if(!docSnapshot) return undefined;
     return docSnapshot["server"];
-  }
-  getToken() {
-    if(!this._documentSnapshots) return undefined;
-    const docSnapshot = this._documentSnapshots.data();
-    if(!docSnapshot) return undefined;
-    if(!docSnapshot["token"]) {
-      this._ref.set({
-        token: token()
-      }, {merge: true})
-      .then(function() {
-          console.log("Token Added");
-      })
-      .catch(function(error) {
-          console.error("Error writing document: ", error);
-      });
-    }
-    return docSnapshot["token"];
   }
 }
 

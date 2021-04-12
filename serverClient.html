@@ -37,11 +37,19 @@
         <div id="serverIP">
             Server IP: (placeholder)
         </div>
-        <br>
+        <hr>
         <div id="rootPathsContainer">
             Paths: (enter the path to each directory below, comma seperated, then click save)
-            <input id="rootPathsInput" value="test,ing" style='width:100%;'>
+            <input id="rootPathsInput" value="" style='width:100%;'>
             <button onclick="saveRootPaths()">save</button>
+        </div>
+        <hr>
+        <div id="authedUsersContainer">
+            <div id="myUID"></div> 
+            <br>
+            Users: (comma seperate any UIDs of users you want to be able to access your server)
+            <input id="authedUsersInput" value="" style='width:100%;'>
+            <button onclick="saveAuthedUsers()">save</button>
         </div>
     </div>
     
