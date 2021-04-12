@@ -31,7 +31,7 @@ homecloud.galleryController = function(){
 
   homecloud.serverManager.beginListening(()=>{
     api = homecloud.serverManager.getServer()
-    userToken = homecloud.serverManager.getToken()
+    userToken = homecloud.fbAuthManager.token
     if(api) {
       document.getElementById("CALink").href = api;
       // console.log(`help ${document.getElementById("CALink").href}`)
@@ -501,10 +501,6 @@ homecloud.galleryController = function(){
   function navigateToDirectory(path) {
       location.href = `?path=${path}\\&nesting=${curNesting}&sortBy=date`;
   }
-
-  function navigateToNesting(nesting) {
-    location.href = `?path=${curDir}\\&nesting=${nesting}&sortBy=date`;
-  }
 }
 
 homecloud.initializePage = function() {
@@ -613,12 +609,16 @@ function closeElement(elem) {
 
 homecloud.FbAuthManager = class {
 	constructor() {
-		this._user=null;
+		this._user = null;
+    this._token = undefined;
 	}
 	beginListening(changeListener) {
 		firebase.auth().onAuthStateChanged((user)=>{
 			this._user = user;
-			changeListener();
+      user.getIdToken().then((idToken)=>{
+        this._token = idToken
+        changeListener();
+     });
 		})
 	}
 	get isSignedIn() {
@@ -629,6 +629,9 @@ homecloud.FbAuthManager = class {
 	}
 	get photoURL() {
 		return this._user.photoURL;
+	}
+	get token() {
+		return this._token;
 	}
 };
 

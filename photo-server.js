@@ -6,14 +6,17 @@ const httpPort = process.env.PORT || 29980;
 const cors = require('cors');
 const fs = require('fs');
 const bodyParser = require("body-parser");
-const sizeOf = require('image-size');
 const { promisify } = require('util');
 const sizeOfC = promisify(require('image-size'));
-const asyncRoute = require('route-async')
 const { fdir } = require("fdir");
-const fg = require('fast-glob');
 const { readdirSync } = require('fs')
 const natUpnp = require('nat-upnp');
+
+const admin = require('firebase-admin');
+
+admin.initializeApp({
+  projectId: 'my-home-cloud-24'
+});
 
 const options = {
   key: fs.readFileSync("certs/dev-key.pem"),
@@ -37,9 +40,21 @@ app.get('/api/imageByPath', (req, res) => {
   if (!req.query.authorization || req.query.authorization.indexOf('TOKEN ') === -1) {
     return res.status(401).json({ message: 'Missing Authorization Param' });
   }
-  else if(getTokens().some(x=> req.query.authorization.substring(6) != x))
-    return res.status(401).json({ message: 'Incorrect Authorization Param' });
-  else res.sendFile(req.query.path);
+  else {
+    admin
+      .auth()
+      .verifyIdToken(req.query.authorization.substring(6))
+      .then((decodedToken) => {
+        const uid = decodedToken.uid;
+        if(getTokens().some(x=> uid == x))
+          res.sendFile(req.query.path);
+        else 
+          return res.status(401).json({ message: 'Incorrect Authorization Param' })
+      })
+      .catch((error) => {
+        console.log(error)
+      }); 
+  }
 });
 
 app.get('/api/getRoots', (req, res) => {
