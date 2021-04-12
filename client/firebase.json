@@ -18,6 +18,10 @@
     {
       "source": "/main",
       "destination": "/main.html"
+    },
+    {
+      "source": "/settings",
+      "destination": "/settings.html"
     }]
   }
 }

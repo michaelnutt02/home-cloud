@@ -45,8 +45,11 @@
         </div>
     </nav>
     <div class="page-container">
-        <div id="dirRows"></div>
-        <div id="picRows"></div>
+        <div id="serverIPContainer">
+            Server IP: (go to localhost:29990 on your host computer to access this)
+            <input id="serverIPInput" value="loading/empty" style='width:100%;'>
+            <button id="serverIPSave">save</button>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" 
@@ -57,7 +60,7 @@
         integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
     <script>$(document).ready(function() { $('body').bootstrapMaterialDesign(); });</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.js"></script>
-    <script> var homecloud = homecloud || {}; homecloud.page = "main" </script>
+    <script> var homecloud = homecloud || {}; homecloud.page = "settings" </script>
     <script src="/main.js"></script>
 </body>
 

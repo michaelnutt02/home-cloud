@@ -7,6 +7,7 @@ homecloud.galleryController = function(){
   let fullscreenElement = "";
   let imageInfoElement = "";
   let api = homecloud.serverManager.getServer();
+  let userToken = homecloud.serverManager.getToken();
 
   const queryString = location.search;
   const urlParams = new URLSearchParams(queryString);
@@ -30,59 +31,49 @@ homecloud.galleryController = function(){
 
   homecloud.serverManager.beginListening(()=>{
     api = homecloud.serverManager.getServer()
+    userToken = homecloud.serverManager.getToken()
     if(api) {
       document.getElementById("CALink").href = api;
       // console.log(`help ${document.getElementById("CALink").href}`)
       startUp();
     }
-    else console.log("No server set up.  I'm lazy so you have to do that through the console.")
+    else console.log("No server set up.  You can do this through the server client (localhost:29990).")
   })
 
   async function startUp() {
-    curRoots = await (await fetch(api+'getRoots')).json();
-    const dirs = (await (await fetch(`${api}getAllDirs?path=${encodeURIComponent(curDir)}`)).json()).sort();
-    console.log(dirs);
-    const images = await (await fetch(`${api}getAllImages?path=${encodeURIComponent(curDir)}&nesting=${curNesting}`)).json();
-    console.log(images);
-
-    selectDirectories(curDir, dirs);
-    
-    selectImages(images, curSortBy);
-  }
-
-  function imagesAtNesting(nesting, myImageTree) {
-    let images = myImageTree.images || [];
-    if(nesting == 0) return images;
-    Object.keys(myImageTree).forEach(x=> images = [...images, ...imagesAtNesting(nesting-1, myImageTree[x])])
-    return images;
+    fetch(api+'getRoots', {
+      method: 'GET',
+      // withCredentials: true,
+      // credentials: 'include',
+      // headers: {
+      //     'Authorization': userToken
+      // }
+    })
+      .then(rawRoots => rawRoots.json())
+      .then(newRoots => {
+        curRoots = newRoots;
+        (async ()=>{
+          const dirs = (await (await fetch(`${api}getAllDirs?path=${encodeURIComponent(curDir)}`)).json()).sort();
+          console.log(dirs);
+          const images = await (await fetch(`${api}getAllImages?path=${encodeURIComponent(curDir)}&nesting=${curNesting}`)).json();
+          console.log(images);
+      
+          selectDirectories(curDir, dirs);
+          
+          selectImages(images, curSortBy);
+        })();
+      })
+      .catch(err => {
+        console.log(err)
+        document.getElementsByClassName("page-container")[0].innerHTML += "Error connecting to server.  Most likely cause is an expered CA certificate." + 
+          '<a class="nav-link" href="'+api+'">Click here, and if your browser prompts you about an untrusted source, go into advanced and click proceed to site.  Then return to this page.</a>'
+      })
   }
 
   function htmlToElement(html) {
       var template = document.createElement('template');
       template.innerHTML = html;
       return template.content.firstChild;
-  }
-
-  function fetchAllPictures(dir, callback) {
-    fetch(api+'getAllImages?path='+encodeURIComponent(dir))
-    .then(response => response.json())
-    .then(rawImages => {
-      console.log(rawImages);
-      try {
-        sessionStorage.setItem('allImages', JSON.stringify(rawImages));
-      } catch (err) {
-        allPicturesTooBig = true;
-      }
-      curAllImages = rawImages;
-      callback();
-    });
-  }
-
-  async function allImages() {
-    return clientImagePaths || !allPicturesTooBig? JSON.parse(sessionStorage.getItem('allImages')) : 
-      (curAllImages? curAllImages :
-      await fetch(api+'getAllImages?path='+encodeURIComponent(curDir))
-      .then(response => response.json()));
   }
 
   async function appendImageDates(images) {
@@ -99,22 +90,6 @@ homecloud.galleryController = function(){
       .then(data => {
         return data
       });
-  }
-
-  async function imageTree() {
-    let imageTree = {};
-    (await allImages()).filter(x=>x.includes(curDir)).forEach(image => {
-      let pathArray = image.replace(curDir,'').split("\\");
-      pathArray.reduce((prev,value) => (value==pathArray[pathArray.length-1]?
-        (prev.images? prev.images.push(image):prev.images = [image])
-        :(prev[value] = prev[value] || {}), prev[value]), imageTree);
-    });
-    if(curRoots.some(root => {
-      let pathArray = root.split("\\");
-      return pathArray.some(x=>imageTree[x]);
-    })) imageTree = curRoots.reduce((p,n) => {return{...p, [n]:imageTree[n]}},{})
-    console.log(imageTree);
-    return imageTree;
   }
 
   function selectDirectories(dir, subDirs) {
@@ -140,7 +115,7 @@ homecloud.galleryController = function(){
   }
 
   function getImageUrl(imagePath) {
-    return api+'imageByPath?path='+encodeURIComponent(imagePath);
+    return api+`imageByPath?path=${encodeURIComponent(imagePath)}&authorization=TOKEN ${userToken}`;
   }
 
   async function selectImages(rawImages, sortBy) {
@@ -159,7 +134,6 @@ homecloud.galleryController = function(){
 
     pageImageNames = images;
 
-    // fetchPictureData(0);
     loadPictureDataRow();
 
     setSlider();
@@ -549,6 +523,28 @@ homecloud.initializePage = function() {
       });
       });
 	}
+
+  if(homecloud.page == "settings"){
+    homecloud.serverManager = new homecloud.ServerManager();
+    $("#signOutSideNavButton").click((event) => {
+      console.log("sign out");
+  
+      firebase.auth().signOut().then(function() {
+        // Sign-out successful.
+        console.log("You are now signed out");
+      }).catch(function(error) {
+        // An error happened.
+        console.log("Signed out error");
+      });
+    });
+    console.log(homecloud.serverManager.getServer())
+    homecloud.serverManager.beginListening(()=>{
+      $("#serverIPInput").val(homecloud.serverManager.getServer());
+    })
+    $("#serverIPSave").click((event) => {
+      homecloud.serverManager.setServer($("#serverIPInput").val())
+    });
+	}
 };
 
 homecloud.ServerManager = class {
@@ -562,7 +558,7 @@ homecloud.ServerManager = class {
     
 		this._ref.set({
       server: server
-    })
+    }, {merge: true})
     .then(function() {
         console.log("Server Added");
     })
@@ -584,7 +580,32 @@ homecloud.ServerManager = class {
     if(!docSnapshot) return undefined;
     return docSnapshot["server"];
   }
+  getToken() {
+    if(!this._documentSnapshots) return undefined;
+    const docSnapshot = this._documentSnapshots.data();
+    if(!docSnapshot) return undefined;
+    if(!docSnapshot["token"]) {
+      this._ref.set({
+        token: token()
+      }, {merge: true})
+      .then(function() {
+          console.log("Token Added");
+      })
+      .catch(function(error) {
+          console.error("Error writing document: ", error);
+      });
+    }
+    return docSnapshot["token"];
+  }
 }
+
+var rand = function() {
+  return Math.random().toString(36).substr(2); // remove `0.`
+};
+
+var token = function() {
+  return rand() + rand(); // to make it longer
+};
 
 function closeElement(elem) {
   elem.remove();
